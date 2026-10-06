@@ -82,7 +82,7 @@ footer a{color:inherit}
   </section>
 
   <p class="note" id="status" hidden></p>
-  <footer>Lists update automatically from my public GitHub repositories.</footer>
+  <footer>Lists update automatically from my GitHub repositories.</footer>
 </main>
 
 <script>
@@ -91,6 +91,8 @@ footer a{color:inherit}
   const host = location.hostname.match(/^([^.]+)\.github\.io$/i);
   const user = host ? host[1] : 'jonbaldauf';
   const hub = (user + '.github.io').toLowerCase();
+  // Repositories to leave off this page (names, any capitalisation)
+  const HIDDEN = ['vex-robot', 'bike-game', 'RockPaperScissors', 'PDV-Data-Reduction-Analysis'].map(n => n.toLowerCase());
   document.getElementById('ghLink').href = 'https://github.com/' + user;
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -111,7 +113,7 @@ footer a{color:inherit}
     try{
       const res = await fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed`);
       if(!res.ok) throw 0;
-      repos = (await res.json()).filter(r => !r.private && r.name.toLowerCase() !== hub);
+      repos = (await res.json()).filter(r => !r.private && r.name.toLowerCase() !== hub && !HIDDEN.includes(r.name.toLowerCase()));
     }catch(e){
       $('status').textContent = 'Couldn’t reach GitHub just now, so the list may be incomplete. Reload to try again.';
       $('status').hidden = false;
